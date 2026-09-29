@@ -148,7 +148,6 @@ docker compose config
 
 ```
 Cinema-microservice/
-├── .github/                      # CI/CD workflow automation
 ├── Admin UI/                     # Web admin dashboard (Astro + Tailwind CSS)
 ├── POS client UI/                # Desktop cashier application (WPF + .NET Core)
 ├── infra/
