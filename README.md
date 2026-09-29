@@ -116,20 +116,6 @@ Once the containers are started, the following services and web interfaces are a
 - **Single-Print Invariant**: Box-office tickets have a strict physical print state. Once an original ticket stub has been printed, reprint attempts require supervisor authorization and are explicitly watermarked.
 - **QR Code Gate Check-In**: Cryptographically signed ticket payloads ensure tickets cannot be forged and can only be redeemed once at the gate.
 
----
-
-## Architecture Mapping: Spring Boot to ASP.NET Core
-
-For developers transitioning between Java/Spring Cloud and modern .NET:
-
-| Spring Boot / Spring Cloud Pattern | Modern ASP.NET Core / .NET 8 Equivalent | Implementation in this System |
-|---|---|---|
-| Spring Cloud Gateway | YARP (Yet Another Reverse Proxy) | Configured in `Gateway.Api` for route mapping and proxying |
-| Eureka / Spring Cloud Discovery | Container DNS & Service Discovery | Direct Docker network name resolution eliminating registry sync lag |
-| Spring Cloud Config | `IConfiguration` & `IOptionsMonitor<T>` | Live-reloading configuration providers built into ASP.NET Core |
-| Spring Data JPA / Hibernate | Dapper & Npgsql | High-performance parameterized SQL data access with raw execution speed |
-| Spring Cache (`@Cacheable`) | `IDistributedCache` + `StackExchange.Redis` | Standard distributed caching abstraction configured across all services |
-| Spring Actuator | ASP.NET Core Health Checks | Dedicated `/health/live` and `/health/ready` endpoints on every service |
 
 ---
 
