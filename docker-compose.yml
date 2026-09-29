@@ -1,0 +1,446 @@
+name: cinema-pos
+
+x-service-env: &service-env
+  ASPNETCORE_ENVIRONMENT: Development
+  ConnectionStrings__WriteDb: Host=postgres;Port=5432;Database=${POSTGRES_DB:-cinema};Username=${POSTGRES_USER:-cinema_app};Password=${POSTGRES_PASSWORD:-change-this-development-password}
+  ConnectionStrings__ReadDb: Host=postgres-replica;Port=5432;Database=${POSTGRES_DB:-cinema};Username=${POSTGRES_USER:-cinema_app};Password=${POSTGRES_PASSWORD:-change-this-development-password}
+  Redis__Configuration: redis:6379,password=change-this-development-password,abortConnect=false
+  RabbitMQ__Host: rabbitmq
+  RabbitMQ__Username: cinema_app
+  RabbitMQ__Password: change-this-development-password
+  RabbitMQ__Port: 5672
+  Seq__ServerUrl: http://seq:80
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+  Webhooks__PaymentSecret: change-this-development-payment-webhook-secret-min32chars
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-cinema_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-this-development-password}
+      POSTGRES_DB: ${POSTGRES_DB:-cinema}
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        mkdir -p /docker-entrypoint-initdb.d
+        cat << 'EOF' > /docker-entrypoint-initdb.d/00_replication_config.sh
+        #!/bin/bash
+        echo "host replication all 0.0.0.0/0 scram-sha-256" >> "/var/lib/postgresql/data/pg_hba.conf"
+        EOF
+        chmod +x /docker-entrypoint-initdb.d/00_replication_config.sh
+        exec docker-entrypoint.sh postgres -c wal_level=replica -c max_wal_senders=10 -c max_replication_slots=10 -c hot_standby=on
+    ports:
+      - "127.0.0.1:5433:5432"
+    networks:
+      - cinema_net
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cinema_app} -d ${POSTGRES_DB:-cinema}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+
+  postgres-replica:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-cinema_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-this-development-password}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-change-this-development-password}
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        if [ ! -s "/var/lib/postgresql/data/PG_VERSION" ]; then
+            echo "Waiting for primary to be ready..."
+            until pg_isready -h postgres -U $${POSTGRES_USER:-cinema_app}; do sleep 2; done
+            echo "Taking basebackup..."
+            pg_basebackup -h postgres -D /var/lib/postgresql/data -U $${POSTGRES_USER:-cinema_app} -v -P -R -X stream -c fast
+        fi
+        exec docker-entrypoint.sh postgres
+    ports:
+      - "127.0.0.1:5434:5432"
+    networks:
+      - cinema_net
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - postgres-replica-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cinema_app}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--requirepass", "change-this-development-password"]
+    ports:
+      - "127.0.0.1:6379:6379"
+    networks:
+      - cinema_net
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a change-this-development-password ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: cinema_app
+      RABBITMQ_DEFAULT_PASS: change-this-development-password
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+    networks:
+      - cinema_net
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.58
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16186:16686"
+      - "4317:4317"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:16686 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - cinema_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+
+  seq:
+    image: datalust/seq:latest
+    environment:
+      ACCEPT_EULA: "Y"
+      SEQ_FIRSTRUN_NOAUTHENTICATION: "true"
+    ports:
+      - "5341:80"
+    networks:
+      - cinema_net
+    volumes:
+      - seq-data:/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+
+  minio:
+    image: quay.io/minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: change-this-development-password
+      MINIO_SERVER_URL: http://minio:9000
+      MINIO_BROWSER_REDIRECT_URL: http://localhost:8080/minio-console/
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    networks:
+      - cinema_net
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "mc ready local || curl -f http://localhost:9000/minio/health/live || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+
+  minio-create-bucket:
+    image: quay.io/minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        until /usr/bin/mc alias set myminio http://minio:9000 minioadmin change-this-development-password; do
+          echo 'Waiting for MinIO...'
+          sleep 1
+        done
+        /usr/bin/mc mb myminio/cinema-media --ignore-existing
+        /usr/bin/mc anonymous set download myminio/cinema-media
+        /usr/bin/mc mb myminio/cinema-icons --ignore-existing
+        /usr/bin/mc anonymous set download myminio/cinema-icons
+        exit 0
+    networks:
+      - cinema_net
+
+  db-migrator:
+    build:
+      context: .
+      dockerfile: src/Cinema.DbMigrator/Dockerfile
+    environment:
+      POSTGRES_CONNECTION_STRING: Host=postgres;Port=5432;Database=${POSTGRES_DB:-cinema};Username=${POSTGRES_USER:-cinema_app};Password=${POSTGRES_PASSWORD:-change-this-development-password}
+      RUN_BOOTSTRAP_SEED: "true"
+    networks:
+      - cinema_net
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  catalog-api:
+    build: { context: ., dockerfile: src/Services/Catalog.Api/Dockerfile }
+    depends_on:
+      postgres:
+        condition: service_healthy
+      db-migrator:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      <<: *service-env
+      OTEL_SERVICE_NAME: catalog-api
+      Storage__Provider: "S3"
+      Storage__S3__BucketName: "cinema-media"
+      Storage__S3__ServiceURL: "http://minio:9000"
+      Storage__S3__ForcePathStyle: "true"
+      Storage__S3__AccessKey: "minioadmin"
+      Storage__S3__SecretKey: "change-this-development-password"
+      Storage__S3__PublicBaseUrl: "http://localhost:8080/api/v1/media/files"
+    networks:
+      - cinema_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  reservation-api:
+    build: { context: ., dockerfile: src/Services/Reservation.Api/Dockerfile }
+    depends_on:
+      postgres:
+        condition: service_healthy
+      db-migrator:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      <<: *service-env
+      OTEL_SERVICE_NAME: reservation-api
+    networks:
+      - cinema_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  pos-api:
+    build: { context: ., dockerfile: src/Services/Pos.Api/Dockerfile }
+    depends_on:
+      postgres:
+        condition: service_healthy
+      db-migrator:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      <<: *service-env
+      OTEL_SERVICE_NAME: pos-api
+    networks:
+      - cinema_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  ticket-api:
+    build: { context: ., dockerfile: src/Services/Ticket.Api/Dockerfile }
+    depends_on:
+      postgres:
+        condition: service_healthy
+      db-migrator:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      <<: *service-env
+      OTEL_SERVICE_NAME: ticket-api
+    networks:
+      - cinema_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  identity-api:
+    build: { context: ., dockerfile: src/Services/Identity.Api/Dockerfile }
+    depends_on:
+      postgres:
+        condition: service_healthy
+      db-migrator:
+        condition: service_completed_successfully
+    environment:
+      <<: *service-env
+      OTEL_SERVICE_NAME: identity-api
+    networks:
+      - cinema_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  loyalty-api:
+    build: { context: ., dockerfile: src/Services/Loyalty.Api/Dockerfile }
+    depends_on:
+      postgres:
+        condition: service_healthy
+      db-migrator:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      <<: *service-env
+      OTEL_SERVICE_NAME: loyalty-api
+    networks:
+      - cinema_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  api-gateway:
+    build: { context: ., dockerfile: src/Services/Gateway.Api/Dockerfile }
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      OTEL_SERVICE_NAME: gateway-api
+      Services__CatalogUrl: http://catalog-api:8080
+      Services__ReservationUrl: http://reservation-api:8080
+      Services__PosUrl: http://pos-api:8080
+      Services__TicketUrl: http://ticket-api:8080
+      Services__IdentityUrl: http://identity-api:8080
+      Services__LoyaltyUrl: http://loyalty-api:8080
+      Services__MinioConsoleUrl: http://minio:9001
+      Services__MinioS3Url: http://minio:9000
+      Redis__Configuration: redis:6379,password=change-this-development-password,abortConnect=false
+      Seq__ServerUrl: http://seq:80
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+    ports:
+      - "8080:8080"
+    networks:
+      - cinema_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  pgweb:
+    image: sosedoff/pgweb:latest
+    environment:
+      PGWEB_DATABASE_URL: postgres://${POSTGRES_USER:-cinema_app}:${POSTGRES_PASSWORD:-change-this-development-password}@postgres:5432/${POSTGRES_DB:-cinema}?sslmode=disable
+    ports:
+      - "8086:8081"
+    networks:
+      - cinema_net
+    depends_on:
+      postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+      REDIS_HOSTS: local:redis:6379:0:change-this-development-password
+    ports:
+      - "8087:8081"
+    networks:
+      - cinema_net
+    depends_on:
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - cinema_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+volumes:
+  postgres-data:
+  postgres-replica-data:
+  redis-data:
+  rabbitmq-data:
+  seq-data:
+  minio-data:
+
+networks:
+  cinema_net:
+    driver: bridge

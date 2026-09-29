@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="CinemaPOS.App/CinemaPOS.App.csproj" />
+  <Project Path="CinemaPOS.Core/CinemaPOS.Core.csproj" />
+  <Project Path="CinemaPOS.Tests/CinemaPOS.Tests.csproj" />
+</Solution>

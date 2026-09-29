@@ -1,0 +1,8 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ShowtimesContent from '../../components/ShowtimesContent.jsx';
+---
+
+<AdminLayout title="Showtime Schedule" contentType="table">
+  <ShowtimesContent client:only="react" />
+</AdminLayout>

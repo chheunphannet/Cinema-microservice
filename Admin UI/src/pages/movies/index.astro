@@ -1,0 +1,8 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import MoviesContent from '../../components/MoviesContent.jsx';
+---
+
+<AdminLayout title="Movie Catalog" contentType="table">
+  <MoviesContent client:only="react" />
+</AdminLayout>

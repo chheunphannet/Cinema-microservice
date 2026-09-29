@@ -1,0 +1,28 @@
+---
+import '../styles/theme.css';
+import LoginForm from '../components/LoginForm.jsx';
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Login - Cinema Admin</title>
+		<style>
+			body {
+				margin: 0;
+				background-color: #f2f3f3; /* Cloudscape grey-100 */
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+			}
+		</style>
+	</head>
+	<body>
+		<LoginForm client:only="react" />
+	</body>
+</html>

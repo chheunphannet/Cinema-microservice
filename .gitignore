@@ -1,0 +1,44 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+publish/
+Publish/
+
+# Logs & temp files
+[Ll]og/
+[Ll]ogs/
+*.log
+temp_tail.txt
+__pycache__/
+*.py[cod]
+
+# Testing & Coverage
+[Tt]est[Rr]esults/
+TestResults/
+*.cobertura.xml
+coverage*.xml
+
+# Visual Studio / Rider / VS Code
+.vs/
+.vscode/
+.idea/
+*.user
+*.userosv
+*.suo
+*.userprefs
+*.sln.docstates
+
+# Node & Frontend
+node_modules/
+dist/
+.astro/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+**/appsettings.Development.json

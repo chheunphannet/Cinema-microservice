@@ -1,0 +1,8 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import PricingContent from '../../components/PricingContent.jsx';
+---
+
+<AdminLayout title="Pricing & Rules" contentType="form">
+  <PricingContent client:only="react" />
+</AdminLayout>

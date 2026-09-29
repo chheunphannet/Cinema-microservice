@@ -1,0 +1,8 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import InventoryContent from '../../components/InventoryContent.jsx';
+---
+
+<AdminLayout title="F&B Inventory" contentType="table">
+  <InventoryContent client:only="react" />
+</AdminLayout>

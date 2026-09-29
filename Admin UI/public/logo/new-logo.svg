@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -200 800 800" width="800" height="800">
+  <defs>
+    <!-- Primary vibrant gradient for the flow bars and letters -->
+    <linearGradient id="netGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0E5A8A" />
+      <stop offset="35%" stop-color="#1B82B8" />
+      <stop offset="70%" stop-color="#38A3D8" />
+      <stop offset="100%" stop-color="#56C5F0" />
+    </linearGradient>
+
+    <!-- Subtle accent gradient -->
+    <linearGradient id="nGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0B4B74" />
+      <stop offset="100%" stop-color="#146A9E" />
+    </linearGradient>
+
+    <linearGradient id="tGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4CBBEB" />
+      <stop offset="100%" stop-color="#6ED3F8" />
+    </linearGradient>
+
+    <!-- Subtle soft shadow for depth -->
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="130%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0E5A8A" flood-opacity="0.16" />
+    </filter>
+  </defs>
+
+  <g filter="url(#softShadow)" transform="translate(40, 20)">
+    <!-- Letter 'N' -->
+    <path d="M 90 270 L 90 130 L 126 130 L 195 235 L 195 105 L 230 105 L 230 248 L 194 248 L 125 142 L 125 270 Z" 
+          fill="url(#nGrad)" />
+
+    <!-- Three arched dynamic flow bars forming the 'E' center, bowing subtly upward/downward like the reference -->
+    <!-- Top curved band -->
+    <path d="M 252 145 C 380 126, 520 126, 620 145 C 520 136, 380 136, 252 155 Z" 
+          fill="url(#netGrad)" />
+    <!-- Center curved band -->
+    <path d="M 252 188 C 380 178, 520 178, 620 188 C 520 181, 380 181, 252 196 Z" 
+          fill="url(#netGrad)" />
+    <!-- Bottom curved band -->
+    <path d="M 252 230 C 380 230, 520 230, 620 238 C 520 223, 380 223, 252 238 Z" 
+          fill="url(#netGrad)" />
+
+    <!-- Letter 'T' with slight dynamic tilt and precision geometry -->
+    <g transform="translate(635, 110)">
+      <!-- Crossbar of T -->
+      <polygon points="0,22 110,40 106,62 -4,44" fill="url(#tGrad)" />
+      <!-- Stem of T -->
+      <polygon points="43,52 75,57 60,165 28,160" fill="url(#tGrad)" />
+    </g>
+  </g>
+</svg>

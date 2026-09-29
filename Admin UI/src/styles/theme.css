@@ -1,0 +1,321 @@
+/* Import Cloudscape global styles */
+@import '@cloudscape-design/global-styles/index.css';
+@import '@cloudscape-design/global-styles/dark-mode-utils.css';
+
+:root {
+  /* AWS Console Light Mode Clone Palette */
+  --aws-base01-light: rgb(250, 250, 250);
+  --aws-base02-light: rgb(234, 243, 233);
+  --aws-base03-light: rgb(230, 242, 248);
+  --aws-base04-light: rgb(239, 240, 243);
+  --aws-text-primary-light: rgb(35, 48, 61);
+  --aws-text-secondary-light: rgb(90, 109, 132);
+  --aws-orange-light: rgb(214, 102, 42);
+  --aws-blue-light: rgb(53, 81, 199);
+
+  --color-background-layout-main: var(--aws-base01-light);
+  --color-background-container-content: #ffffff;
+  --color-text-body-default: var(--aws-text-primary-light);
+  --color-text-body-secondary: var(--aws-text-secondary-light);
+  
+  /* Primary Action Colors */
+  --color-background-button-primary-default: var(--aws-orange-light);
+  --color-background-button-primary-hover: rgb(235, 115, 50);
+  --color-text-link-default: var(--aws-blue-light);
+  --color-background-control-checked: var(--aws-blue-light);
+}
+
+body[data-awsui-mode="dark"] {
+  /* AWS Console Dark Mode Clone Palette */
+  --aws-base01-dark: rgb(35, 47, 60);
+  --aws-base02-dark: rgb(59, 76, 89);
+  --aws-base03-dark: rgb(78, 88, 98);
+  --aws-base04-dark: rgb(73, 86, 90);
+  --aws-text-primary-dark: rgb(250, 250, 250);
+  --aws-text-secondary-dark: rgb(143, 168, 194);
+  --aws-orange-dark: rgb(253, 152, 49);
+  --aws-blue-dark: rgb(78, 134, 249);
+
+  /* Overriding Cloudscape Variables */
+  --color-background-layout-main: var(--aws-base01-dark);
+  --color-background-container-content: var(--aws-base02-dark);
+  --color-background-container-header: var(--aws-base03-dark);
+  --color-text-body-default: var(--aws-text-primary-dark);
+  --color-text-body-secondary: var(--aws-text-secondary-dark);
+  --color-text-heading-default: var(--aws-text-primary-dark);
+  --color-background-button-primary-default: var(--aws-orange-dark);
+  --color-background-button-primary-hover: rgb(255, 172, 69);
+  --color-text-link-default: var(--aws-blue-dark);
+  --color-background-control-checked: var(--aws-blue-dark);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* Enlarge TopNavigation logo */
+img[alt="Cinema POS Logo"] {
+  height: 48px !important;
+  width: auto !important;
+}
+
+/* Ensure primary button variant applies brand orange styling */
+button[class*="variant-primary"],
+a[class*="variant-primary"] {
+  background-color: rgb(214, 102, 42) !important;
+  border-color: rgb(214, 102, 42) !important;
+  color: #ffffff !important;
+}
+
+button[class*="variant-primary"]:hover,
+a[class*="variant-primary"]:hover {
+  background-color: rgb(235, 115, 50) !important;
+  border-color: rgb(235, 115, 50) !important;
+}
+
+body[data-awsui-mode="dark"] button[class*="variant-primary"],
+body[data-awsui-mode="dark"] a[class*="variant-primary"] {
+  background-color: rgb(253, 152, 49) !important;
+  border-color: rgb(253, 152, 49) !important;
+  color: #0f172a !important;
+}
+
+body[data-awsui-mode="dark"] button[class*="variant-primary"]:hover,
+body[data-awsui-mode="dark"] a[class*="variant-primary"]:hover {
+  background-color: rgb(255, 172, 69) !important;
+  border-color: rgb(255, 172, 69) !important;
+}
+
+/* ==========================================================================
+   Tactile Status Pill Style (Matching status-pills.webp)
+   - Pill radius: 9999px
+   - Dual-layer depth: Inset top highlight + Inset bottom shadow + Soft drop shadow
+   - Clean pastel tinted backgrounds with colored text & icons
+   ========================================================================== */
+
+/* 1. Global Pill Base for StatusIndicator & Badge */
+[class*="awsui_root_"][class*="awsui_status-"]:not(#\9),
+[class*="awsui_badge_"]:not(#\9) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 9999px !important;
+  padding: 3.5px 13px 3.5px 11px !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.01em !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+  vertical-align: middle !important;
+  transition: all 0.15s ease-in-out !important;
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.8),
+              inset 0 -1px 1px 0 rgba(0, 0, 0, 0.05),
+              0 1px 2px 0 rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Ensure inner container inside StatusIndicator aligns cleanly */
+[class*="awsui_root_"][class*="awsui_status-"]:not(#\9) > [class*="awsui_container_"] {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background: transparent !important;
+}
+
+/* StatusIndicator icon sizing & alignment */
+[class*="awsui_root_"][class*="awsui_status-"]:not(#\9) [class*="awsui_icon_"] {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  margin-inline-end: 2px !important;
+}
+
+[class*="awsui_root_"][class*="awsui_status-"]:not(#\9) [class*="awsui_icon_"] svg {
+  width: 14px !important;
+  height: 14px !important;
+  vertical-align: middle !important;
+}
+
+/* ==========================================================================
+   Color Variants (Aligned with our color system & status-pills.webp)
+   ========================================================================== */
+
+/* --- SUCCESS (Green / Active / In Stock / Valid / Confirmed) --- */
+[class*="awsui_status-success_"]:not(#\9),
+[class*="awsui_badge-color-green_"]:not(#\9) {
+  background: linear-gradient(180deg, #e8f9ed 0%, #daf4e1 100%) !important;
+  border-color: #a7e9b8 !important;
+  color: #15803d !important;
+}
+[class*="awsui_status-success_"]:not(#\9) [class*="awsui_icon_"],
+[class*="awsui_status-success_"]:not(#\9) [class*="awsui_icon_"] svg {
+  color: #15803d !important;
+  stroke: #15803d !important;
+}
+
+/* --- SUBMITTED / INFO / IN PROGRESS (Blue / Scheduled / Coming Soon) --- */
+[class*="awsui_status-info_"]:not(#\9),
+[class*="awsui_status-in-progress_"]:not(#\9),
+[class*="awsui_badge-color-blue_"]:not(#\9) {
+  background: linear-gradient(180deg, #ebf3ff 0%, #dbeafe 100%) !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
+}
+[class*="awsui_status-info_"]:not(#\9) [class*="awsui_icon_"],
+[class*="awsui_status-info_"]:not(#\9) [class*="awsui_icon_"] svg,
+[class*="awsui_status-in-progress_"]:not(#\9) [class*="awsui_icon_"],
+[class*="awsui_status-in-progress_"]:not(#\9) [class*="awsui_icon_"] svg {
+  color: #1d4ed8 !important;
+  stroke: #1d4ed8 !important;
+}
+
+/* --- PENDING / WARNING (Amber / Orange / Low Stock / Conflict) --- */
+[class*="awsui_status-warning_"]:not(#\9),
+[class*="awsui_status-pending_"]:not(#\9),
+[class*="awsui_badge-color-severity-medium_"]:not(#\9) {
+  background: linear-gradient(180deg, #fef8eb 0%, #fef0d5 100%) !important;
+  border-color: #fde2ab !important;
+  color: #b45309 !important;
+}
+[class*="awsui_status-warning_"]:not(#\9) [class*="awsui_icon_"],
+[class*="awsui_status-warning_"]:not(#\9) [class*="awsui_icon_"] svg,
+[class*="awsui_status-pending_"]:not(#\9) [class*="awsui_icon_"],
+[class*="awsui_status-pending_"]:not(#\9) [class*="awsui_icon_"] svg {
+  color: #b45309 !important;
+  stroke: #b45309 !important;
+}
+
+/* --- FAILED / ERROR (Red / Cancelled / Out of Stock / Critical) --- */
+[class*="awsui_status-error_"]:not(#\9),
+[class*="awsui_badge-color-red_"]:not(#\9),
+[class*="awsui_badge-color-severity-critical_"]:not(#\9),
+[class*="awsui_badge-color-severity-high_"]:not(#\9) {
+  background: linear-gradient(180deg, #fef2f2 0%, #fee2e2 100%) !important;
+  border-color: #fecaca !important;
+  color: #b91c1c !important;
+}
+[class*="awsui_status-error_"]:not(#\9) [class*="awsui_icon_"],
+[class*="awsui_status-error_"]:not(#\9) [class*="awsui_icon_"] svg {
+  color: #b91c1c !important;
+  stroke: #b91c1c !important;
+}
+
+/* --- EXPIRED / STOPPED / NEUTRAL (Grey / Inactive / Completed / Ended) --- */
+[class*="awsui_status-stopped_"]:not(#\9),
+[class*="awsui_badge-color-grey_"]:not(#\9),
+[class*="awsui_badge-color-severity-neutral_"]:not(#\9),
+[class*="awsui_badge-color-severity-low_"]:not(#\9) {
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+[class*="awsui_status-stopped_"]:not(#\9) [class*="awsui_icon_"],
+[class*="awsui_status-stopped_"]:not(#\9) [class*="awsui_icon_"] svg {
+  color: #334155 !important;
+  stroke: #334155 !important;
+}
+
+/* --- PURPLE (Content Manager / 4DX / Special format) --- */
+[class*="awsui_badge-color-purple_"]:not(#\9) {
+  background: linear-gradient(180deg, #faf5ff 0%, #f3e8ff 100%) !important;
+  border-color: #e9d5ff !important;
+  color: #7e22ce !important;
+}
+
+/* --- TEAL (Supervisor / Special category) --- */
+[class*="awsui_badge-color-teal_"]:not(#\9) {
+  background: linear-gradient(180deg, #f0fdfa 0%, #ccfbf1 100%) !important;
+  border-color: #99f6e4 !important;
+  color: #0f766e !important;
+}
+
+/* ==========================================================================
+   Dark Mode Pill Overrides
+   ========================================================================== */
+body[data-awsui-mode="dark"] [class*="awsui_root_"][class*="awsui_status-"]:not(#\9),
+body[data-awsui-mode="dark"] [class*="awsui_badge_"]:not(#\9) {
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.15),
+              inset 0 -1px 1px 0 rgba(0, 0, 0, 0.35),
+              0 1px 2px 0 rgba(0, 0, 0, 0.25) !important;
+}
+
+body[data-awsui-mode="dark"] [class*="awsui_status-success_"]:not(#\9),
+body[data-awsui-mode="dark"] [class*="awsui_badge-color-green_"]:not(#\9) {
+  background: linear-gradient(180deg, rgba(22, 101, 52, 0.45) 0%, rgba(20, 83, 45, 0.5) 100%) !important;
+  border-color: rgba(74, 222, 128, 0.4) !important;
+  color: #86efac !important;
+}
+body[data-awsui-mode="dark"] [class*="awsui_status-success_"]:not(#\9) [class*="awsui_icon_"] svg {
+  color: #86efac !important;
+  stroke: #86efac !important;
+}
+
+body[data-awsui-mode="dark"] [class*="awsui_status-info_"]:not(#\9),
+body[data-awsui-mode="dark"] [class*="awsui_status-in-progress_"]:not(#\9),
+body[data-awsui-mode="dark"] [class*="awsui_badge-color-blue_"]:not(#\9) {
+  background: linear-gradient(180deg, rgba(30, 64, 175, 0.45) 0%, rgba(29, 78, 216, 0.5) 100%) !important;
+  border-color: rgba(96, 165, 250, 0.4) !important;
+  color: #93c5fd !important;
+}
+body[data-awsui-mode="dark"] [class*="awsui_status-info_"]:not(#\9) [class*="awsui_icon_"] svg,
+body[data-awsui-mode="dark"] [class*="awsui_status-in-progress_"]:not(#\9) [class*="awsui_icon_"] svg {
+  color: #93c5fd !important;
+  stroke: #93c5fd !important;
+}
+
+body[data-awsui-mode="dark"] [class*="awsui_status-warning_"]:not(#\9),
+body[data-awsui-mode="dark"] [class*="awsui_status-pending_"]:not(#\9),
+body[data-awsui-mode="dark"] [class*="awsui_badge-color-severity-medium_"]:not(#\9) {
+  background: linear-gradient(180deg, rgba(180, 83, 9, 0.45) 0%, rgba(146, 64, 14, 0.5) 100%) !important;
+  border-color: rgba(251, 191, 36, 0.4) !important;
+  color: #fde68a !important;
+}
+body[data-awsui-mode="dark"] [class*="awsui_status-warning_"]:not(#\9) [class*="awsui_icon_"] svg,
+body[data-awsui-mode="dark"] [class*="awsui_status-pending_"]:not(#\9) [class*="awsui_icon_"] svg {
+  color: #fde68a !important;
+  stroke: #fde68a !important;
+}
+
+body[data-awsui-mode="dark"] [class*="awsui_status-error_"]:not(#\9),
+body[data-awsui-mode="dark"] [class*="awsui_badge-color-red_"]:not(#\9),
+body[data-awsui-mode="dark"] [class*="awsui_badge-color-severity-critical_"]:not(#\9),
+body[data-awsui-mode="dark"] [class*="awsui_badge-color-severity-high_"]:not(#\9) {
+  background: linear-gradient(180deg, rgba(185, 28, 28, 0.45) 0%, rgba(153, 27, 27, 0.5) 100%) !important;
+  border-color: rgba(248, 113, 113, 0.4) !important;
+  color: #fca5a5 !important;
+}
+body[data-awsui-mode="dark"] [class*="awsui_status-error_"]:not(#\9) [class*="awsui_icon_"] svg {
+  color: #fca5a5 !important;
+  stroke: #fca5a5 !important;
+}
+
+body[data-awsui-mode="dark"] [class*="awsui_status-stopped_"]:not(#\9),
+body[data-awsui-mode="dark"] [class*="awsui_badge-color-grey_"]:not(#\9),
+body[data-awsui-mode="dark"] [class*="awsui_badge-color-severity-neutral_"]:not(#\9),
+body[data-awsui-mode="dark"] [class*="awsui_badge-color-severity-low_"]:not(#\9) {
+  background: linear-gradient(180deg, rgba(51, 65, 85, 0.45) 0%, rgba(30, 41, 59, 0.5) 100%) !important;
+  border-color: rgba(148, 163, 184, 0.4) !important;
+  color: #cbd5e1 !important;
+}
+body[data-awsui-mode="dark"] [class*="awsui_status-stopped_"]:not(#\9) [class*="awsui_icon_"] svg {
+  color: #cbd5e1 !important;
+  stroke: #cbd5e1 !important;
+}
+
+body[data-awsui-mode="dark"] [class*="awsui_badge-color-purple_"]:not(#\9) {
+  background: linear-gradient(180deg, rgba(126, 34, 206, 0.45) 0%, rgba(107, 33, 168, 0.5) 100%) !important;
+  border-color: rgba(192, 132, 252, 0.4) !important;
+  color: #d8b4fe !important;
+}
+
+body[data-awsui-mode="dark"] [class*="awsui_badge-color-teal_"]:not(#\9) {
+  background: linear-gradient(180deg, rgba(15, 118, 110, 0.45) 0%, rgba(17, 94, 89, 0.5) 100%) !important;
+  border-color: rgba(45, 212, 191, 0.4) !important;
+  color: #5eead4 !important;
+}
+

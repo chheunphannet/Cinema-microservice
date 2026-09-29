@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "astro": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "skillPath": "skills/astro/SKILL.md",
+      "computedHash": "1071d32bd30e64486137a893e8ba3855f5a853d1756d608fdc80958fe9b52e0c"
+    }
+  }
+}

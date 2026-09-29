@@ -1,0 +1,11 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import UsersContent from '../../components/UsersContent.jsx';
+
+---
+
+<AdminLayout title="Users" contentType="table">
+  
+    <UsersContent client:only="react" />
+  
+</AdminLayout>

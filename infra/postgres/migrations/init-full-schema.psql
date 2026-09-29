@@ -1,0 +1,36 @@
+-- Cinema POS full database bootstrap (PostgreSQL / psql)
+--
+-- Run this against a NEW, EMPTY database:
+--   psql -X -v ON_ERROR_STOP=1 -d cinema -f infra/postgres/migrations/init-full-schema.psql
+--
+-- This is deliberately a .psql file rather than a DbUp .sql migration. The
+-- application's DbUp migrator continues to apply the individual forward-only
+-- migrations and will not execute this bootstrap entry point.
+--
+-- Do not run it against a database that already has application tables. Use
+-- the regular DbUp migrator for an existing database.
+
+\set ON_ERROR_STOP on
+
+\echo Applying Cinema POS schema migrations to an empty database...
+\ir 001-init.sql
+\ir 003-guest-checkout.sql
+\ir 004-booking-numbers.sql
+\ir 005-fb-fulfillment.sql
+\ir 006-dynamic-pricing.sql
+\ir 007-combos.sql
+\ir 009-loyalty-schema.sql
+\ir 012-outbox.sql
+\ir 013-customer-accounts.sql
+\ir 014-order-voucher.sql
+\ir 015-rich-catalog-and-notifications.sql
+\ir 016-search-indexing-and-filters.sql
+\ir 017-screen-optimized-catalog.sql
+\ir 018-customer-social-auth.sql
+\ir 019-enterprise-rbac-and-staff.sql
+\ir 020-showtime-scheduling-and-seat-blocks.sql
+\ir 021-multi-branch-inventory-and-suppliers.sql
+\ir 022-refunds-and-disputes.sql
+\ir 023-system-feature-flags.sql
+\ir 024-fix-movies-supported-formats.sql
+\echo Cinema POS schema bootstrap completed.

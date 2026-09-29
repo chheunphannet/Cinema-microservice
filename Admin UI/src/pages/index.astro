@@ -1,0 +1,8 @@
+---
+import AdminLayout from '../layouts/AdminLayout.astro';
+import DashboardContent from '../components/DashboardContent.jsx';
+---
+
+<AdminLayout title="Dashboard" contentType="cards">
+	<DashboardContent client:only="react" />
+</AdminLayout>

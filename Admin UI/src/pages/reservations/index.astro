@@ -1,0 +1,8 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ReservationsContent from '../../components/ReservationsContent.jsx';
+---
+
+<AdminLayout title="Reservations" contentType="table">
+  <ReservationsContent client:only="react" />
+</AdminLayout>
